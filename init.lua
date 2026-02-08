@@ -41,7 +41,7 @@ vim.keymap.set("n", "<F2>", function()
 end, { desc = "Next error (or warning if no errors)" })
 
 -- Go to previous error (or previous warning if no errors)
-vim.keymap.set("n", "<S-F2>", function()
+vim.keymap.set("n", "<F14>", function()
   local errors = vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
   if #errors > 0 then
     vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
