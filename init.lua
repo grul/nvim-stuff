@@ -17,9 +17,17 @@ vim.opt.relativenumber = true
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
+vim.opt.colorcolumn = "100"
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
--- Ctrl+S to save
+-- Keybindo
 vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<Esc>:w<CR>", { desc = "Save file" })
+-- vim.keymap.set("n", "<leader>e", vim.cmd.Ex, { desc = "Open file explorer" })
+vim.keymap.set("n", "<Tab>", ":bnext<CR>")
+vim.keymap.set("n", "<S-Tab>", ":bprev<CR>")
+vim.keymap.set("n", "<leader>q", ":wqa<CR>", { desc = "Save all and quit" })
+vim.keymap.set("n", "<Esc>", ":noh<CR><Esc>", { desc = "Clear search highlights" })
 
 -- Plugin setup
 require("lazy").setup({
@@ -41,7 +49,21 @@ require("lazy").setup({
       vim.cmd([[colorscheme gruvbox]])
     end,
   },
-
+  {
+    "akinsho/bufferline.nvim",
+    dependencies = "nvim-tree/nvim-web-devicons",
+    config = function()
+      require("bufferline").setup()
+    end,
+  },
+  {
+    "nvim-tree/nvim-tree.lua",
+    dependencies = "nvim-tree/nvim-web-devicons",
+    config = function()
+      require("nvim-tree").setup()
+      vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")
+    end,
+  },
   -- Treesitter for syntax highlighting
   {
     "nvim-treesitter/nvim-treesitter",
@@ -177,6 +199,33 @@ require("lazy").setup({
     },
   }
 })
+
+-- Disable bold text globally (place this AFTER the require("lazy").setup() block)
+vim.api.nvim_create_autocmd("ColorScheme", {
+  callback = function()
+    -- Get all highlight groups
+    local highlights = vim.api.nvim_get_hl(0, {})
+
+    -- Remove bold from all groups
+    for group, attrs in pairs(highlights) do
+      if attrs.bold then
+        attrs.bold = false
+        vim.api.nvim_set_hl(0, group, attrs)
+      end
+    end
+  end,
+})
+
+-- Apply to current colorscheme
+vim.schedule(function()
+  local highlights = vim.api.nvim_get_hl(0, {})
+  for group, attrs in pairs(highlights) do
+    if attrs.bold then
+      attrs.bold = false
+      vim.api.nvim_set_hl(0, group, attrs)
+    end
+  end
+end)
 
 -- LSP Configuration using vim.lsp.config (Neovim 0.11+)
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
