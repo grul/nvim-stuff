@@ -253,15 +253,16 @@ require("lazy").setup({
 
 -- Disable bold text globally (place this AFTER the require("lazy").setup() block)
 vim.api.nvim_create_autocmd("ColorScheme", {
+  pattern = "*",
   callback = function()
-    -- Get all highlight groups
     local highlights = vim.api.nvim_get_hl(0, {})
-
-    -- Remove bold from all groups
     for group, attrs in pairs(highlights) do
-      if attrs.bold then
-        attrs.bold = false
-        vim.api.nvim_set_hl(0, group, attrs)
+      -- Check if italic or bold are set, then turn them off
+      if attrs.italic or attrs.bold then
+        local new_attrs = vim.deepcopy(attrs)
+        new_attrs.italic = false
+        new_attrs.bold = false -- Keep this if you still want bold disabled too
+        vim.api.nvim_set_hl(0, group, new_attrs)
       end
     end
   end,
@@ -273,6 +274,10 @@ vim.schedule(function()
   for group, attrs in pairs(highlights) do
     if attrs.bold then
       attrs.bold = false
+      vim.api.nvim_set_hl(0, group, attrs)
+    end
+    if attrs.italic then
+      attrs.italic = false
       vim.api.nvim_set_hl(0, group, attrs)
     end
   end
