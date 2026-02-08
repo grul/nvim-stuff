@@ -1,39 +1,191 @@
--- Clone lazy nvim if it does not exist already
+-- ~/.config/nvim/init.lua
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable",
-		lazypath,
-	})
+  vim.fn.system({
+    "git", "clone", "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", lazypath,
+  })
 end
 vim.opt.rtp:prepend(lazypath)
 
-vim.g.mapleader = " " -- Make sure to set `mapleader` before lazy so your mappings are correct
+-- Basic settings
+vim.g.mapleader = " "
+vim.opt.number = true
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+vim.opt.tabstop = 2
 
+-- Ctrl+S to save
+vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<Esc>:w<CR>", { desc = "Save file" })
+
+-- Plugin setup
 require("lazy").setup({
-	spec = {
-		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
-		-- { "plugins.rustyrust" },
-		{ import = "lazyvim.plugins.extras.lang.typescript" },
-		{
-			"ellisonleao/gruvbox.nvim",
-			lazy = false, -- make sure we load this during startup if it is your main colorscheme
-			priority = 1000, -- make sure to load this before all the other start plugins
-			config = function()
-				require("gruvbox").setup({
-					italic = {
-						strings = false,
-						comments = false,
-						operators = false,
-						folds = false,
-					},
-				})
-				vim.cmd([[colorscheme gruvbox]])
-			end,
-		},
-	},
+  -- Gruvbox colorscheme
+  {
+    "ellisonleao/gruvbox.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require("gruvbox").setup({
+        italic = {
+          strings = false,
+          comments = false,
+          operators = false,
+          folds = false,
+          emphasis = false,
+        },
+      })
+      vim.cmd([[colorscheme gruvbox]])
+    end,
+  },
+
+  -- Treesitter for syntax highlighting
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    config = function()
+      vim.treesitter.language.add("rust")
+      vim.treesitter.language.add("typescript")
+      vim.treesitter.language.add("javascript")
+      vim.treesitter.language.add("tsx")
+      vim.treesitter.language.add("lua")
+    end,
+  },
+
+  -- Mason for managing LSP servers
+  {
+    "williamboman/mason.nvim",
+    config = function()
+      require("mason").setup()
+    end,
+  },
+
+  {
+    "williamboman/mason-lspconfig.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    config = function()
+      require("mason-lspconfig").setup({
+        ensure_installed = { "rust_analyzer", "ts_ls", "lua_ls" },
+      })
+    end,
+  },
+
+  -- Which-key for keybinding hints
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("which-key").setup()
+    end,
+  },
+
+  -- Autocompletion
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+    },
+    config = function()
+      local cmp = require("cmp")
+      local luasnip = require("luasnip")
+
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+        }),
+        sources = cmp.config.sources({
+          { name = "nvim_lsp" },
+          { name = "luasnip" },
+        }, {
+          { name = "buffer" },
+          { name = "path" },
+        }),
+      })
+    end,
+  },
+})
+
+-- LSP Configuration using vim.lsp.config (Neovim 0.11+)
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+-- Rust Analyzer
+vim.lsp.config("rust_analyzer", {
+  cmd = { "rust-analyzer" },
+  filetypes = { "rust" },
+  root_markers = { "Cargo.toml", "rust-project.json" },
+  capabilities = capabilities,
+  settings = {
+    ["rust-analyzer"] = {
+      cargo = { allFeatures = true },
+      check = { command = "clippy" },
+    },
+  },
+})
+
+-- TypeScript Language Server
+vim.lsp.config("ts_ls", {
+  cmd = { "typescript-language-server", "--stdio" },
+  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  root_markers = { "package.json", "tsconfig.json", "jsconfig.json" },
+  capabilities = capabilities,
+})
+
+-- Lua Language Server
+vim.lsp.config("lua_ls", {
+  cmd = { "lua-language-server" },
+  filetypes = { "lua" },
+  root_markers = { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml" },
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      diagnostics = {
+        globals = { "vim" },
+      },
+    },
+  },
+})
+
+-- Enable LSP servers
+vim.lsp.enable({ "rust_analyzer", "ts_ls", "lua_ls" })
+
+-- LSP Keybindings
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    local opts = { buffer = args.buf }
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+  end,
+})
+
+-- Auto format on save for Rust files
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.rs", "*.ts", "*.tsx", "*.js", "*.jsx", "*.lua" },
+  callback = function()
+    vim.lsp.buf.format({ async = false })
+  end,
 })
