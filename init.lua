@@ -28,6 +28,27 @@ vim.keymap.set("n", "<Tab>", ":bnext<CR>")
 vim.keymap.set("n", "<S-Tab>", ":bprev<CR>")
 vim.keymap.set("n", "<leader>q", ":wqa<CR>", { desc = "Save all and quit" })
 vim.keymap.set("n", "<Esc>", ":noh<CR><Esc>", { desc = "Clear search highlights" })
+vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Close buffer" })
+
+-- Go to next error (or next warning if no errors)
+vim.keymap.set("n", "<F2>", function()
+  local errors = vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
+  if #errors > 0 then
+    vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+  else
+    vim.diagnostic.goto_next()
+  end
+end, { desc = "Next error (or warning if no errors)" })
+
+-- Go to previous error (or previous warning if no errors)
+vim.keymap.set("n", "<S-F2>", function()
+  local errors = vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
+  if #errors > 0 then
+    vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+  else
+    vim.diagnostic.goto_prev()
+  end
+end, { desc = "Previous error (or warning if no errors)" })
 
 -- Plugin setup
 require("lazy").setup({
@@ -45,8 +66,33 @@ require("lazy").setup({
           folds = false,
           emphasis = false,
         },
+        overrides = {
+          Normal = { bg = "#080808" },
+          NormalFloat = { bg = "#080808" },
+        },
       })
-      vim.cmd([[colorscheme gruvbox]])
+      -- vim.cmd([[colorscheme gruvbox]])
+    end,
+  },
+  {
+    "rebelot/kanagawa.nvim",
+    priority = 1000,
+    config = function()
+      vim.cmd([[colorscheme kanagawa]])
+    end,
+  },
+  {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("telescope").setup()
+
+      local builtin = require("telescope.builtin")
+      vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
+      vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live grep" })
+      vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffers" })
+      vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help tags" })
+      vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "Find word under cursor" })
     end,
   },
   {
@@ -60,7 +106,12 @@ require("lazy").setup({
     "nvim-tree/nvim-tree.lua",
     dependencies = "nvim-tree/nvim-web-devicons",
     config = function()
-      require("nvim-tree").setup()
+      require("nvim-tree").setup({
+        actions = {
+          open_file = {
+            quit_on_open = true, }
+        }
+      })
       vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")
     end,
   },
