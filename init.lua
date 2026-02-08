@@ -81,6 +81,12 @@ require("lazy").setup({
     end,
   },
 
+  -- editorconfig
+  {
+    "editorconfig/editorconfig-vim",
+    lazy = false,
+  },
+
   -- Autocompletion
   {
     "hrsh7th/nvim-cmp",
@@ -130,7 +136,11 @@ require("lazy").setup({
   -- TROUBLE
   {
     "folke/trouble.nvim",
-    opts = {}, -- for default options, refer to the configuration section for custom setup.
+    opts = {
+      win = {
+        size = 0.3
+      }
+    }, -- for default options, refer to the configuration section for custom setup.
     cmd = "Trouble",
     keys = {
       {
