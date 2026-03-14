@@ -208,6 +208,27 @@ require("lazy").setup({
         end,
     },
 
+    {
+        "stevearc/conform.nvim",
+        event = { "BufWritePre" },
+        cmd = { "ConformInfo" },
+        config = function()
+            require("conform").setup({
+                -- Map filetypes to the oxfmt formatter
+                formatters_by_ft = {
+                    javascript = { "oxfmt" },
+                    typescript = { "oxfmt" },
+                    javascriptreact = { "oxfmt" },
+                    typescriptreact = { "oxfmt" },
+                },
+                -- This replaces your custom autocommand!
+                format_on_save = {
+                    timeout_ms = 500,
+                    lsp_format = "fallback",
+                },
+            })
+        end,
+    },
     -- TROUBLE
     {
         "folke/trouble.nvim",
@@ -339,9 +360,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 -- Auto format on save for Rust files
-vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = { "*.rs", "*.ts", "*.tsx", "*.js", "*.jsx", "*.lua" },
-    callback = function()
-        vim.lsp.buf.format({ async = false })
-    end,
-})
+-- vim.api.nvim_create_autocmd("BufWritePre", {
+--     pattern = { "*.rs", "*.ts", "*.tsx", "*.js", "*.jsx", "*.lua" },
+--     callback = function()
+--         vim.lsp.buf.format({ async = false })
+--     end,
+-- })
