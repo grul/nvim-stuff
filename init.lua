@@ -142,7 +142,7 @@ require("lazy").setup({
         dependencies = { "williamboman/mason.nvim" },
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "rust_analyzer", "ts_ls", "lua_ls" },
+                ensure_installed = { "rust_analyzer", "ts_ls", "lua_ls", "cssls" },
             })
         end,
     },
@@ -208,6 +208,7 @@ require("lazy").setup({
         end,
     },
 
+    -- CONFORM
     {
         "stevearc/conform.nvim",
         event = { "BufWritePre" },
@@ -218,10 +219,10 @@ require("lazy").setup({
                 formatters_by_ft = {
                     javascript = { "oxfmt" },
                     typescript = { "oxfmt" },
+                    css = { "css" },
                     javascriptreact = { "oxfmt" },
                     typescriptreact = { "oxfmt" },
                 },
-                -- This replaces your custom autocommand!
                 format_on_save = {
                     timeout_ms = 500,
                     lsp_format = "fallback",
@@ -229,6 +230,7 @@ require("lazy").setup({
             })
         end,
     },
+
     -- TROUBLE
     {
         "folke/trouble.nvim",
@@ -236,7 +238,7 @@ require("lazy").setup({
             win = {
                 size = 0.3
             }
-        }, -- for default options, refer to the configuration section for custom setup.
+        },
         cmd = "Trouble",
         keys = {
             {
@@ -273,24 +275,22 @@ require("lazy").setup({
     }
 })
 
--- Disable bold text globally (place this AFTER the require("lazy").setup() block)
+-- Disable italic and bold text globally (must be AFTER the require("lazy").setup() block)
 vim.api.nvim_create_autocmd("ColorScheme", {
     pattern = "*",
     callback = function()
         local highlights = vim.api.nvim_get_hl(0, {})
         for group, attrs in pairs(highlights) do
-            -- Check if italic or bold are set, then turn them off
             if attrs.italic or attrs.bold then
                 local new_attrs = vim.deepcopy(attrs)
                 new_attrs.italic = false
-                new_attrs.bold = false -- Keep this if you still want bold disabled too
+                new_attrs.bold = false
                 vim.api.nvim_set_hl(0, group, new_attrs)
             end
         end
     end,
 })
 
--- Apply to current colorscheme
 vim.schedule(function()
     local highlights = vim.api.nvim_get_hl(0, {})
     for group, attrs in pairs(highlights) do
@@ -345,8 +345,16 @@ vim.lsp.config("lua_ls", {
     },
 })
 
+-- CSS Language Server
+vim.lsp.config("cssls", {
+    cmd = { "vscode-css-language-server", "--stdio" },
+    filetypes = { "css", "scss", "less" },
+    root_markers = { "package.json", ".git" },
+    capabilities = capabilities,
+})
+
 -- Enable LSP servers
-vim.lsp.enable({ "rust_analyzer", "ts_ls", "lua_ls" })
+vim.lsp.enable({ "rust_analyzer", "ts_ls", "lua_ls", "cssls" })
 
 -- LSP Keybindings
 vim.api.nvim_create_autocmd("LspAttach", {
