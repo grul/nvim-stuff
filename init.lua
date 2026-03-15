@@ -245,7 +245,7 @@ require("lazy").setup({
                 formatters_by_ft = {
                     javascript = { "oxfmt" },
                     typescript = { "oxfmt" },
-                    css = { "css" },
+                    css = { "oxfmt" },
                     javascriptreact = { "oxfmt" },
                     typescriptreact = { "oxfmt" },
                 },
