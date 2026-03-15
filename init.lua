@@ -17,7 +17,7 @@ vim.opt.relativenumber = true
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
-vim.opt.colorcolumn = "100"
+vim.opt.colorcolumn = "120"
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.scrolloff = 20
@@ -27,6 +27,7 @@ vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<Esc>:w<CR>", { desc = "Save file" }
 -- vim.keymap.set("n", "<leader>e", vim.cmd.Ex, { desc = "Open file explorer" })
 vim.keymap.set("n", "<Tab>", ":bnext<CR>")
 vim.keymap.set("n", "<S-Tab>", ":bprev<CR>")
+vim.keymap.set("n", "<leader>s", ":wa<CR>", { desc = "Save all" })
 vim.keymap.set("n", "<leader>q", ":wqa<CR>", { desc = "Save all and quit" })
 vim.keymap.set("n", "<Esc>", ":noh<CR><Esc>", { desc = "Clear search highlights" })
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Close buffer" })
