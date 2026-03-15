@@ -79,7 +79,38 @@ require("lazy").setup({
         "rebelot/kanagawa.nvim",
         priority = 1000,
         config = function()
-            vim.cmd([[colorscheme kanagawa]])
+            -- vim.cmd([[colorscheme kanagawa]])
+        end,
+    },
+    {
+        "rose-pine/neovim",
+        name = "rose-pine",
+        priority = 1000,
+        config = function()
+            -- vim.cmd([[colorscheme rose-pine]])
+        end,
+    },
+    {
+        "catppuccin/nvim",
+        name = "catppuccin",
+        priority = 1000,
+        config = function()
+            -- vim.cmd([[colorscheme catppuccin-mocha]])
+        end,
+    },
+    {
+        "shaunsingh/nord.nvim",
+        priority = 1000,
+        config = function()
+            -- vim.cmd([[colorscheme nord]])
+        end,
+    },
+    {
+        "EdenEast/nightfox.nvim",
+        priority = 1000,
+        config = function()
+            -- nightfox, dayfox, dawnfox, duskfox, nordfox, terafox, carbonfox
+            vim.cmd([[colorscheme terafox]])
         end,
     },
     {
