@@ -156,12 +156,6 @@ require("lazy").setup({
         end,
     },
 
-    -- editorconfig
-    {
-        "editorconfig/editorconfig-vim",
-        lazy = false,
-    },
-
     -- Autocompletion
     {
         "hrsh7th/nvim-cmp",
