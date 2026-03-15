@@ -358,11 +358,3 @@ vim.api.nvim_create_autocmd("LspAttach", {
         vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
     end,
 })
-
--- Auto format on save for Rust files
--- vim.api.nvim_create_autocmd("BufWritePre", {
---     pattern = { "*.rs", "*.ts", "*.tsx", "*.js", "*.jsx", "*.lua" },
---     callback = function()
---         vim.lsp.buf.format({ async = false })
---     end,
--- })
