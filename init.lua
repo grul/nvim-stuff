@@ -237,22 +237,32 @@ require("lazy").setup({
     -- CONFORM
     {
         "stevearc/conform.nvim",
-        event = { "BufWritePre" },
+        -- event = { "BufWritePre" },
         cmd = { "ConformInfo" },
+        keys = {
+            {
+                "<M-F>",
+                function()
+                    require("conform").format({ async = true, lsp_format = "fallback" })
+                end,
+                mode = "n",
+                desc = "Format buffer",
+            },
+        },
         config = function()
             require("conform").setup({
-                -- Map filetypes to the oxfmt formatter
                 formatters_by_ft = {
-                    javascript = { "oxfmt" },
-                    typescript = { "oxfmt" },
-                    css = { "oxfmt" },
-                    javascriptreact = { "oxfmt" },
-                    typescriptreact = { "oxfmt" },
+                    javascript = { "dprint" },
+                    typescript = { "dprint" },
+                    html = { "dprint" },
+                    css = { "dprint" },
+                    javascriptreact = { "dprint" },
+                    typescriptreact = { "dprint" },
                 },
-                format_on_save = {
-                    timeout_ms = 500,
-                    lsp_format = "fallback",
-                },
+                -- format_on_save = {
+                --     timeout_ms = 2000,
+                --     lsp_format = "fallback",
+                -- },
             })
         end,
     },
