@@ -231,6 +231,11 @@ require("lazy").setup({
                     { name = "path" },
                 }),
             })
+
+            -- Disable autocompletion in markdown files
+            cmp.setup.filetype("markdown", {
+                enabled = false,
+            })
         end,
     },
 
