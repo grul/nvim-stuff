@@ -126,6 +126,7 @@ require("lazy").setup({
             vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffers" })
             vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help tags" })
             vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "Find word under cursor" })
+            vim.keymap.set("n", "<leader>fr", builtin.lsp_references, { desc = "Find references (LSP)" })
         end,
     },
     {
