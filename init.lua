@@ -146,7 +146,7 @@ require("lazy").setup({
                         quit_on_open = true, }
                 }
             })
-            vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")
+            vim.keymap.set("n", "<leader>e", ":NvimTreeFindFileToggle<CR>")
         end,
     },
     -- Treesitter for syntax highlighting
