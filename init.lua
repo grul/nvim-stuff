@@ -118,7 +118,14 @@ require("lazy").setup({
         "nvim-telescope/telescope.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
-            require("telescope").setup()
+            require("telescope").setup({
+                defaults = {
+                    layout_config = {
+                        width = 0.999999, -- 1.0 will be interpreted as number of columns. 0.9999 = percentage
+                        height = 0.999999,
+                    },
+                },
+            })
 
             local builtin = require("telescope.builtin")
             vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
@@ -285,8 +292,8 @@ require("lazy").setup({
                         vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
                     end
 
-                    map("n", "<leader>gl", function() gs.nav_hunk("next") end, "Next hunk")
-                    map("n", "<leader>gh", function() gs.nav_hunk("prev") end, "Previous hunk")
+                    map("n", "<leader>gj", function() gs.nav_hunk("next") end, "Next hunk")
+                    map("n", "<leader>gk", function() gs.nav_hunk("prev") end, "Previous hunk")
                     map("n", "<leader>gp", gs.preview_hunk, "Preview hunk")
                     map("n", "<leader>gs", gs.stage_hunk, "Stage hunk")
                     map("n", "<leader>gr", gs.reset_hunk, "Reset hunk")
@@ -298,6 +305,10 @@ require("lazy").setup({
     },
 
     -- Full-file / project-wide diff view
+    -- Usage:
+    -- :DiffviewOpen [rev_range] (e.g. HEAD~1..HEAD)
+    -- :DiffviewOpen commit_hash^! (to see changes in a single commit)
+    -- Use <leader>gh to browse history and <Enter> on a commit to see its changes.
     {
         "sindrets/diffview.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
@@ -305,7 +316,19 @@ require("lazy").setup({
         keys = {
             { "<leader>gd", "<cmd>DiffviewOpen<cr>",          desc = "Open diff view" },
             { "<leader>gD", "<cmd>DiffviewClose<cr>",         desc = "Close diff view" },
+            { "<leader>gh", "<cmd>DiffviewFileHistory<cr>",   desc = "Project history" },
             { "<leader>gH", "<cmd>DiffviewFileHistory %<cr>", desc = "File history (current file)" },
+            {
+                "<leader>gc",
+                function()
+                    vim.ui.input({ prompt = "Diff commits (e.g. HEAD~1..HEAD or commit_hash): " }, function(input)
+                        if input and input ~= "" then
+                            vim.cmd("DiffviewOpen " .. input)
+                        end
+                    end)
+                end,
+                desc = "Diff specific commits",
+            },
         },
     },
 
