@@ -332,6 +332,18 @@ require("lazy").setup({
         },
     },
 
+    -- Animated cursor trail / smear effect
+    {
+        "sphamba/smear-cursor.nvim",
+        event = "VeryLazy",
+        opts = {
+            stiffness = 0.6,           -- 0 = smoother/longer, 1 = snappier (head)
+            trailing_stiffness = 0.25, -- lower = tail lingers longer at origin
+            trailing_exponent = 3,     -- higher = tail hangs at origin before whipping forward
+            -- distance_stop_animating = 0.1,
+        },
+    },
+
     -- TROUBLE
     {
         "folke/trouble.nvim",
