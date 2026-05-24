@@ -263,14 +263,36 @@ require("lazy").setup({
             },
         },
         config = function()
+            -- Auto-pick a formatter based on which config file is present in
+            -- the project. Each entry's built-in `condition` walks upward from
+            -- the buffer looking for its config; `stop_after_first` runs only
+            -- the first match. Prettier has no condition, so it's the fallback.
+            local chain = { "biome", "dprint", "oxfmt", "prettier", stop_after_first = true }
+
             require("conform").setup({
                 formatters_by_ft = {
-                    javascript = { "dprint" },
-                    typescript = { "dprint" },
-                    html = { "dprint" },
-                    css = { "dprint" },
-                    javascriptreact = { "dprint" },
-                    typescriptreact = { "dprint" },
+                    javascript      = chain,
+                    typescript      = chain,
+                    javascriptreact = chain,
+                    typescriptreact = chain,
+                    json            = chain,
+                    jsonc           = chain,
+                    html            = chain,
+                    css             = chain,
+                },
+                formatters = {
+                    -- oxfmt isn't built into conform yet; defined here so it
+                    -- only fires when an oxc config exists upward from the buffer.
+                    oxfmt = {
+                        command = "oxfmt",
+                        stdin = true,
+                        condition = function(_, ctx)
+                            return vim.fs.find({ ".oxlintrc.json", "oxfmt.json" }, {
+                                path = ctx.filename,
+                                upward = true,
+                            })[1] ~= nil
+                        end,
+                    },
                 },
                 -- format_on_save = {
                 --     timeout_ms = 2000,
@@ -336,12 +358,26 @@ require("lazy").setup({
     {
         "sphamba/smear-cursor.nvim",
         event = "VeryLazy",
-        opts = {
-            stiffness = 0.6,           -- 0 = smoother/longer, 1 = snappier (head)
-            trailing_stiffness = 0.25, -- lower = tail lingers longer at origin
-            trailing_exponent = 3,     -- higher = tail hangs at origin before whipping forward
-            -- distance_stop_animating = 0.1,
-        },
+        opts = function()
+            -- Read current Normal bg so the smear "shadow" blends with the theme
+            local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
+            local bg = normal.bg and string.format("#%06x", normal.bg) or "#000000"
+
+            return {
+                -- Make the smear shadow match the editor bg (Windows Terminal can't
+                transparent_bg_fallback_color = bg,
+
+                legacy_computing_symbols_support = false,
+                cursor_color = "#d3cdc3",            -- explicit color avoids OSC misdetection
+                smear_horizontally = false,          -- only smear on vertical/scroll motion
+
+                -- Motion feel
+                stiffness = 0.6,                     -- head speed (0 = floppy, 1 = snappy)
+                trailing_stiffness = 0.25,           -- lower = tail lingers longer at origin
+                -- trailing_exponent = 3,               -- higher = tail hangs before whipping forward
+                distance_stop_animating = 3,       -- end animation early to avoid jitter
+            }
+        end,
     },
 
     -- TROUBLE
