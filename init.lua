@@ -54,66 +54,7 @@ end, { desc = "Previous error (or warning if no errors)" })
 
 -- Plugin setup
 require("lazy").setup({
-    -- Gruvbox colorscheme
-    {
-        "ellisonleao/gruvbox.nvim",
-        lazy = false,
-        priority = 1000,
-        config = function()
-            require("gruvbox").setup({
-                italic = {
-                    strings = false,
-                    comments = false,
-                    operators = false,
-                    folds = false,
-                    emphasis = false,
-                },
-                overrides = {
-                    Normal = { bg = "#080808" },
-                    NormalFloat = { bg = "#080808" },
-                },
-            })
-            -- vim.cmd([[colorscheme gruvbox]])
-        end,
-    },
-    {
-        "rebelot/kanagawa.nvim",
-        priority = 1000,
-        config = function()
-            -- vim.cmd([[colorscheme kanagawa]])
-        end,
-    },
-    {
-        "rose-pine/neovim",
-        name = "rose-pine",
-        priority = 1000,
-        config = function()
-            -- vim.cmd([[colorscheme rose-pine]])
-        end,
-    },
-    {
-        "catppuccin/nvim",
-        name = "catppuccin",
-        priority = 1000,
-        config = function()
-            -- vim.cmd([[colorscheme catppuccin-mocha]])
-        end,
-    },
-    {
-        "shaunsingh/nord.nvim",
-        priority = 1000,
-        config = function()
-            -- vim.cmd([[colorscheme nord]])
-        end,
-    },
-    {
-        "EdenEast/nightfox.nvim",
-        priority = 1000,
-        config = function()
-            -- nightfox, dayfox, dawnfox, duskfox, nordfox, terafox, carbonfox
-            vim.cmd([[colorscheme terafox]])
-        end,
-    },
+    require("plugins.colorscheme"),
     {
         "nvim-telescope/telescope.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
@@ -183,6 +124,18 @@ require("lazy").setup({
         config = function()
             require("mason-lspconfig").setup({
                 ensure_installed = { "rust_analyzer", "ts_ls", "lua_ls", "cssls" },
+            })
+        end,
+    },
+
+    -- Auto-install non-LSP tools (formatters/linters). mason-lspconfig only
+    -- handles LSP servers, so formatters like oxfmt need this to be installed.
+    {
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        dependencies = { "williamboman/mason.nvim" },
+        config = function()
+            require("mason-tool-installer").setup({
+                ensure_installed = { "oxfmt" },
             })
         end,
     },
