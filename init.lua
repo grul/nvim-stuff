@@ -477,3 +477,6 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.keymap.set("n", "<CR>", "<CR><cmd>cclose<cr>", { buffer = args.buf, silent = true })
     end,
 })
+
+-- Markdown checkbox toggling (markdown buffers only).
+require("markdown_checkbox").setup({ key = "<C-l>" })
