@@ -468,3 +468,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
         vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
     end,
 })
+
+-- In the quickfix list (e.g. gd with multiple results), pressing <CR> jumps to
+-- the entry AND closes the quickfix window.
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "qf",
+    callback = function(args)
+        vim.keymap.set("n", "<CR>", "<CR><cmd>cclose<cr>", { buffer = args.buf, silent = true })
+    end,
+})
