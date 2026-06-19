@@ -59,16 +59,37 @@ require("lazy").setup({
         "nvim-telescope/telescope.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
+            local actions = require("telescope.actions")
+            local action_state = require("telescope.actions.state")
+            local builtin = require("telescope.builtin")
+
+            -- Switch between find_files and live_grep, keeping the typed text
+            local function switch_to(picker)
+                return function(prompt_bufnr)
+                    local text = action_state.get_current_line()
+                    actions.close(prompt_bufnr)
+                    picker({ default_text = text })
+                end
+            end
+
+            local switch_mappings = {
+                ["<C-g>"] = switch_to(builtin.live_grep),
+                ["<C-f>"] = switch_to(builtin.find_files),
+            }
+
             require("telescope").setup({
                 defaults = {
                     layout_config = {
                         width = 0.999999, -- 1.0 will be interpreted as number of columns. 0.9999 = percentage
                         height = 0.999999,
                     },
+                    mappings = {
+                        i = switch_mappings,
+                        n = switch_mappings,
+                    },
                 },
             })
 
-            local builtin = require("telescope.builtin")
             vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
             vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live grep" })
             vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffers" })
@@ -95,6 +116,20 @@ require("lazy").setup({
                 }
             })
             vim.keymap.set("n", "<leader>e", ":NvimTreeFindFileToggle<CR>")
+        end,
+    },
+
+    -- Update imports when files are renamed/moved/deleted in nvim-tree.
+    -- Hooks nvim-tree's file events into the LSP's workspace/willRenameFiles
+    -- request, which ts_ls uses to rewrite import paths project-wide.
+    {
+        "antosha417/nvim-lsp-file-operations",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-tree/nvim-tree.lua",
+        },
+        config = function()
+            require("lsp-file-operations").setup()
         end,
     },
     -- Treesitter for syntax highlighting
@@ -232,6 +267,7 @@ require("lazy").setup({
                     jsonc           = chain,
                     html            = chain,
                     css             = chain,
+                    markdown        = chain,
                 },
                 formatters = {
                     -- oxfmt isn't built into conform yet; defined here so it
@@ -321,14 +357,14 @@ require("lazy").setup({
                 transparent_bg_fallback_color = bg,
 
                 legacy_computing_symbols_support = false,
-                cursor_color = "#d3cdc3",            -- explicit color avoids OSC misdetection
-                smear_horizontally = false,          -- only smear on vertical/scroll motion
+                cursor_color = "#d3cdc3",   -- explicit color avoids OSC misdetection
+                smear_horizontally = false, -- only smear on vertical/scroll motion
 
                 -- Motion feel
-                stiffness = 0.6,                     -- head speed (0 = floppy, 1 = snappy)
-                trailing_stiffness = 0.25,           -- lower = tail lingers longer at origin
+                stiffness = 0.6,             -- head speed (0 = floppy, 1 = snappy)
+                trailing_stiffness = 0.25,   -- lower = tail lingers longer at origin
                 -- trailing_exponent = 3,               -- higher = tail hangs before whipping forward
-                distance_stop_animating = 3,       -- end animation early to avoid jitter
+                distance_stop_animating = 3, -- end animation early to avoid jitter
             }
         end,
     },
@@ -408,7 +444,11 @@ vim.schedule(function()
 end)
 
 -- LSP Configuration using vim.lsp.config (Neovim 0.11+)
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
+local capabilities = vim.tbl_deep_extend(
+    "force",
+    require("cmp_nvim_lsp").default_capabilities(),
+    require("lsp-file-operations").default_capabilities()
+)
 
 -- Rust Analyzer
 vim.lsp.config("rust_analyzer", {
