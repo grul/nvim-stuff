@@ -32,6 +32,19 @@ vim.keymap.set("n", "<leader>q", ":wqa<CR>", { desc = "Save all and quit" })
 vim.keymap.set("n", "<Esc>", ":noh<CR><Esc>", { desc = "Clear search highlights" })
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Close buffer" })
 
+-- Open a TODO file in the cwd (matches todo/TODO/etc. case-insensitively,
+-- any extension). Does nothing if none exists.
+vim.keymap.set("n", "<leader>t", function()
+    local dir = vim.fn.getcwd()
+    for name, type in vim.fs.dir(dir) do
+        if type == "file" and name:gsub("%.[^.]+$", ""):lower() == "todo" then
+            vim.cmd.edit(vim.fs.joinpath(dir, name))
+            return
+        end
+    end
+    vim.notify("No TODO file found in " .. dir, vim.log.levels.WARN)
+end, { desc = "Open TODO file (if one exists)" })
+
 -- Go to next error (or next warning if no errors)
 vim.keymap.set("n", "<F2>", function()
     local errors = vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
