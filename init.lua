@@ -25,8 +25,8 @@ vim.opt.scrolloff = 20
 -- Keybindo
 vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<Esc>:w<CR>", { desc = "Save file" })
 -- vim.keymap.set("n", "<leader>e", vim.cmd.Ex, { desc = "Open file explorer" })
-vim.keymap.set("n", "<Tab>", ":bnext<CR>")
-vim.keymap.set("n", "<S-Tab>", ":bprev<CR>")
+vim.keymap.set("n", "<C-p>", ":bprev<CR>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<C-y>", ":bnext<CR>", { desc = "Next buffer" })
 vim.keymap.set("n", "<leader>s", ":wa<CR>", { desc = "Save all" })
 vim.keymap.set("n", "<leader>q", ":wqa<CR>", { desc = "Save all and quit" })
 vim.keymap.set("n", "<Esc>", ":noh<CR><Esc>", { desc = "Clear search highlights" })
