@@ -150,6 +150,13 @@ require("lazy").setup({
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate",
         config = function()
+            -- Auto-install parsers where the API exists (main branch only).
+            -- html/css are needed for the <template>/<style> blocks injected
+            -- in vue files; otherwise run :TSInstall vue html css once.
+            local treesitter = require("nvim-treesitter")
+            if type(treesitter.install) == "function" then
+                treesitter.install({ "vue", "html", "css" })
+            end
             vim.treesitter.language.add("rust")
             vim.treesitter.language.add("typescript")
             vim.treesitter.language.add("javascript")
@@ -171,7 +178,7 @@ require("lazy").setup({
         dependencies = { "williamboman/mason.nvim" },
         config = function()
             require("mason-lspconfig").setup({
-                ensure_installed = { "rust_analyzer", "ts_ls", "lua_ls", "cssls" },
+                ensure_installed = { "rust_analyzer", "ts_ls", "lua_ls", "cssls", "vuels" },
             })
         end,
     },
@@ -281,6 +288,7 @@ require("lazy").setup({
                     html            = chain,
                     css             = chain,
                     markdown        = chain,
+                    vue             = chain,
                 },
                 formatters = {
                     -- oxfmt isn't built into conform yet; defined here so it
@@ -507,6 +515,9 @@ vim.lsp.config("cssls", {
 
 -- Enable LSP servers
 vim.lsp.enable({ "rust_analyzer", "ts_ls", "lua_ls", "cssls" })
+
+-- Vue support (all wiring contained in lua/vue.lua; comment out to disable)
+require("vue").setup(capabilities)
 
 -- LSP Keybindings
 vim.api.nvim_create_autocmd("LspAttach", {
