@@ -148,20 +148,18 @@ require("lazy").setup({
     -- Treesitter for syntax highlighting
     {
         "nvim-treesitter/nvim-treesitter",
+        branch = "main",
         build = ":TSUpdate",
+        -- Load after mason so its bin dir (tree-sitter-cli) is on PATH
+        -- before install() runs.
+        dependencies = { "williamboman/mason.nvim" },
         config = function()
-            -- Auto-install parsers where the API exists (main branch only).
-            -- html/css are needed for the <template>/<style> blocks injected
-            -- in vue files; otherwise run :TSInstall vue html css once.
-            local treesitter = require("nvim-treesitter")
-            if type(treesitter.install) == "function" then
-                treesitter.install({ "vue", "html", "css" })
-            end
-            vim.treesitter.language.add("rust")
-            vim.treesitter.language.add("typescript")
-            vim.treesitter.language.add("javascript")
-            vim.treesitter.language.add("tsx")
-            vim.treesitter.language.add("lua")
+            -- vue files also need the langs injected into SFC blocks
+            -- (<script> = ts/js, <template> = html, <style> = css).
+            require("nvim-treesitter").install({
+                "vue", "html", "css", "typescript", "javascript",
+                "tsx", "rust", "lua",
+            })
         end,
     },
 
@@ -190,7 +188,9 @@ require("lazy").setup({
         dependencies = { "williamboman/mason.nvim" },
         config = function()
             require("mason-tool-installer").setup({
-                ensure_installed = { "oxfmt" },
+                -- tree-sitter-cli: needed by nvim-treesitter (main branch)
+                -- to compile parsers; via mason so it works on every machine.
+                ensure_installed = { "oxfmt", "tree-sitter-cli" },
             })
         end,
     },

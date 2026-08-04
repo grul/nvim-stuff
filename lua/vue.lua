@@ -11,12 +11,21 @@ local M = {}
 
 function M.setup(capabilities)
     -- Start treesitter highlighting for vue buffers (the built-in regex
-    -- syntax for vue is rudimentary). pcall: silently does nothing if the
-    -- vue parser isn't installed yet.
+    -- syntax for vue is rudimentary).
     vim.api.nvim_create_autocmd("FileType", {
         pattern = "vue",
-        callback = function()
-            pcall(vim.treesitter.start)
+        callback = function(args)
+            local ok, err = pcall(vim.treesitter.start, args.buf)
+            if ok then
+                -- parse(true) parses the whole file including all injected
+                -- languages (ts/html/css); otherwise injections are parsed
+                -- lazily per visible region and highlighting can stop
+                -- mid-file until the boundary is scrolled into view.
+                vim.treesitter.get_parser(args.buf):parse(true)
+            else
+                -- e.g. parser missing/stale — run :TSInstall! vue
+                vim.notify("vue treesitter highlight failed: " .. tostring(err), vim.log.levels.WARN)
+            end
         end,
     })
 
