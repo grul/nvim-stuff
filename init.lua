@@ -342,15 +342,12 @@ require("lazy").setup({
             { "<leader>gD", "<cmd>DiffviewClose<cr>",         desc = "Close diff view" },
             { "<leader>gh", "<cmd>DiffviewFileHistory<cr>",   desc = "Project history" },
             { "<leader>gH", "<cmd>DiffviewFileHistory %<cr>", desc = "File history (current file)" },
+            -- Pre-types the command instead of running it, so diffview's own
+            -- cmdline completion (branches, tags, revs) works with <Tab>.
             {
                 "<leader>gc",
-                function()
-                    vim.ui.input({ prompt = "Diff commits (e.g. HEAD~1..HEAD or commit_hash): " }, function(input)
-                        if input and input ~= "" then
-                            vim.cmd("DiffviewOpen " .. input)
-                        end
-                    end)
-                end,
+                ":DiffviewOpen ",
+                silent = false,
                 desc = "Diff specific commits",
             },
         },
