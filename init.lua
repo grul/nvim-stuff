@@ -157,7 +157,7 @@ require("lazy").setup({
             -- vue files also need the langs injected into SFC blocks
             -- (<script> = ts/js, <template> = html, <style> = css).
             require("nvim-treesitter").install({
-                "vue", "html", "css", "typescript", "javascript",
+                "vue", "html", "css", "scss", "typescript", "javascript",
                 "tsx", "rust", "lua",
             })
         end,
@@ -515,6 +515,19 @@ vim.lsp.config("cssls", {
 
 -- Enable LSP servers
 vim.lsp.enable({ "rust_analyzer", "ts_ls", "lua_ls", "cssls" })
+
+-- Treesitter highlighting for all filetypes with an installed parser
+-- (vue has its own autocmd in lua/vue.lua with a full-file parse).
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = {
+        "typescript", "typescriptreact",
+        "javascript", "javascriptreact",
+        "rust", "css", "scss", "html",
+    },
+    callback = function(args)
+        pcall(vim.treesitter.start, args.buf)
+    end,
+})
 
 -- Vue support (all wiring contained in lua/vue.lua; comment out to disable)
 require("vue").setup(capabilities)
