@@ -190,7 +190,7 @@ require("lazy").setup({
             require("mason-tool-installer").setup({
                 -- tree-sitter-cli: needed by nvim-treesitter (main branch)
                 -- to compile parsers; via mason so it works on every machine.
-                ensure_installed = { "oxfmt", "tree-sitter-cli" },
+                ensure_installed = { "oxfmt", "tree-sitter-cli", "prettier" },
             })
         end,
     },
