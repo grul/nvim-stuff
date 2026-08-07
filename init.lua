@@ -291,13 +291,18 @@ require("lazy").setup({
                     vue             = chain,
                 },
                 formatters = {
-                    -- oxfmt isn't built into conform yet; defined here so it
-                    -- only fires when an oxc config exists upward from the buffer.
+                    -- conform's built-in oxfmt has no condition, so it would win
+                    -- the chain everywhere (mason puts oxfmt on PATH). Only fire
+                    -- when an oxfmt config exists upward; command/args inherit
+                    -- from the built-in, which prefers node_modules/.bin/oxfmt.
                     oxfmt = {
-                        command = "oxfmt",
-                        stdin = true,
                         condition = function(_, ctx)
-                            return vim.fs.find({ ".oxlintrc.json", "oxfmt.json" }, {
+                            return vim.fs.find({
+                                ".oxfmtrc.json",
+                                ".oxfmtrc.jsonc",
+                                "oxfmt.config.ts",
+                                "oxfmt.config.mts",
+                            }, {
                                 path = ctx.filename,
                                 upward = true,
                             })[1] ~= nil
