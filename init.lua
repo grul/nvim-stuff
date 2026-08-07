@@ -195,6 +195,15 @@ require("lazy").setup({
         end,
     },
 
+    -- Auto-save/restore sessions per project directory
+    {
+        "rmagatti/auto-session",
+        lazy = false,
+        opts = {
+            suppressed_dirs = { "~/", "~/Downloads" },
+        },
+    },
+
     -- Which-key for keybinding hints
     {
         "folke/which-key.nvim",
