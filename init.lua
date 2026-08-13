@@ -359,6 +359,13 @@ require("lazy").setup({
         "sindrets/diffview.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory", "DiffviewToggleFiles" },
+        opts = {
+            file_panel = {
+                win_config = {
+                    width = 70, -- default is 35
+                },
+            },
+        },
         keys = {
             { "<leader>gd", "<cmd>DiffviewOpen<cr>",          desc = "Open diff view" },
             { "<leader>gD", "<cmd>DiffviewClose<cr>",         desc = "Close diff view" },
