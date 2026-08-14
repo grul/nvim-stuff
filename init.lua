@@ -201,6 +201,29 @@ require("lazy").setup({
         lazy = false,
         opts = {
             suppressed_dirs = { "~/", "~/Downloads" },
+            pre_restore_cmds = {
+                function(session_name)
+                    local path = require("auto-session").get_root_dir()
+                        .. require("auto-session.lib").escape_session_name(session_name)
+                        .. ".vim"
+
+                    local files = {}
+                    pcall(function()
+                        for line in io.lines(path) do
+                            local f = line:match("^badd %+%d+ (.+)")
+                            if f then
+                                files[#files + 1] = vim.fn.fnamemodify(f, ":t")
+                            end
+                        end
+                    end)
+
+                    local msg = "Restore auto-session?"
+                    if #files > 0 then
+                        msg = table.concat(files, "\n") .. "\n\n" .. msg
+                    end
+                    return vim.fn.confirm(msg, "&Yes\n&No") == 1
+                end,
+            },
         },
     },
 
